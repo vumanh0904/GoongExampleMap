@@ -5,7 +5,6 @@ const PREFIX = APICONST.DEFAULT_PREFIX;
 
 class MapApi {
   getFindText = body => {
-    console.log("444444",body )
     return authorizedRequest.get(
         API_LIST.Find_Place_from_text +
         PREFIX+'&input='+body,

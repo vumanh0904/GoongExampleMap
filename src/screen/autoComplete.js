@@ -75,7 +75,6 @@ const AutoCompleteScreen = ({navigation}) => {
         });
         
         if (geocoding.status === 'OK') {
-            console.log("656565656",geocoding.results[item.index])
                 setLocations(a => [
                     ...a,
                     {
@@ -92,7 +91,6 @@ const AutoCompleteScreen = ({navigation}) => {
         }
 
     }
-    console.log("888888",locations)
 
     const renderHeader = () => {
         return (
