@@ -41,7 +41,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity
                 style={[styles.btnclick, styles.btnGeocoding]}
                 onPress={handleGeocoding}>
-                <Text style={{ marginVertical: 8 }}>Geocoding</Text>
+                <Text style={{ marginVertical: 8 }}>Distance Matrix</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.btnclick, styles.btnFindPlace]}

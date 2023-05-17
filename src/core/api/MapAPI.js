@@ -23,6 +23,12 @@ class MapApi {
         PREFIX,
     );
   };
+  getPlaceDetail = body => {
+    return authorizedRequest.get(        
+        API_LIST.PlaceDetail + body.place_id +'&api_key='+
+        PREFIX,
+    );
+  };
 }
 
 export default new MapApi();

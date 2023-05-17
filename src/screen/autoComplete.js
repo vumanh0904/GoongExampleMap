@@ -49,6 +49,7 @@ const AutoCompleteScreen = ({navigation}) => {
         });
         setDescription(autoComplete.predictions);
     };
+    
 
     const camera = useRef(null);
 
@@ -73,12 +74,21 @@ const AutoCompleteScreen = ({navigation}) => {
         let geocoding = await MapAPi.getGeocoding({
             description:  encodeURIComponent(item.item.description),
         });
+
+        
+
+        let placeDetail = await MapAPi.getPlaceDetail({
+            place_id: description[item.index].place_id
+        });
+
+       
+        const address = placeDetail.result.formatted_address
         
         if (geocoding.status === 'OK') {
                 setLocations(a => [
                     ...a,
                     {
-                        key: (locations.length + 1).toString(),
+                        key: address,
                         coord: [
                             parseFloat(geocoding.results[item.index].geometry.location.lng),
                             parseFloat(geocoding.results[item.index].geometry.location.lat),
