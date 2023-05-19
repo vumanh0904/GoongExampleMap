@@ -338,31 +338,6 @@ const DistanceMatrixScreen = ({ navigation }) => {
                     >
                     </MapboxGL.Camera>
 
-                    {locations.map(item => (
-                        <MapboxGL.PointAnnotation
-                            id="pointDirect"
-                            key="0909"
-                            coordinate={item.coord}
-                            draggable={true}>
-                            <MapboxGL.Callout title={item.key} />
-                        </MapboxGL.PointAnnotation>
-                    ))}
-                    {
-                        isShowMarker ?
-                            <MapboxGL.MarkerView id={"marker"} coordinate={coordinates}>
-                                {/* <View> */}
-                                    <View style={styles.markerContainer}>
-                                        <MapboxGL.Callout
-                                            title={`${infomationDistance}\n${infomationDuration}`} 
-                                            tooltip={true} 
-                                            textStyle={'red'}                                       
-                                            />
-                                    </View>
-                                {/* </View> */}
-                            </MapboxGL.MarkerView> : null
-                    }
-
-
                     <MapboxGL.ShapeSource id="line1" shape={route}>
                         <MapboxGL.LineLayer
                             id="linelayer1"
@@ -371,6 +346,47 @@ const DistanceMatrixScreen = ({ navigation }) => {
                         </MapboxGL.LineLayer>
                     </MapboxGL.ShapeSource>
 
+                    {locations.map((item, index) => (
+                        <MapboxGL.PointAnnotation
+                            id="pointDirect"
+                            key="0909"
+                            coordinate={item.coord}
+                            draggable={true}>
+                            {
+                                index === 0 ?
+                                    <View>
+                                        <Image
+                                            source={require('../assets/icon/start.png')}
+                                            style={styles.icondirect}
+                                            tintColor={'#0E4E9B'}
+                                        />
+                                    </View> :
+                                    <View>
+                                        <Image
+                                            source={require('../assets/icon/end.png')}
+                                            style={styles.icondirect}
+                                            tintColor={'red'}
+                                        />
+                                    </View>
+                            }
+
+                            <MapboxGL.Callout title={item.key} />
+                        </MapboxGL.PointAnnotation>
+                    ))}
+                    {
+                        isShowMarker ?
+                            <MapboxGL.MarkerView id={"marker"} coordinate={coordinates}>
+                                {/* <View> */}
+                                <View style={styles.markerContainer}>
+                                    <MapboxGL.Callout
+                                        title={`${infomationDistance}\n${infomationDuration}`}
+                                        tooltip={true}
+                                        textStyle={'red'}
+                                    />
+                                </View>
+                                {/* </View> */}
+                            </MapboxGL.MarkerView> : null
+                    }
                 </MapboxGL.MapView>
                 <View style={styles.containerInput}>
                     <View style={{ flexDirection: 'row', backgroundColor: '#FFF', width: windowWidth }}>
@@ -411,29 +427,29 @@ const DistanceMatrixScreen = ({ navigation }) => {
                                 />
                             </View>
                             <View>
-                                <View style={{flexDirection:'row', marginHorizontal:16, marginVertical:8}}>
-                                <Icon
-                                    name="car-sport-outline"
-                                    type="ionicon"
-                                    color={'#0E4E9B'}
-                                    size={24}
-                                />
-                                
-                                <Text style={{marginHorizontal:8}}>{`${infomationDistance} ${infomationDuration}`}</Text>
-                                <Icon
-                                    name="bicycle-outline"
-                                    type="ionicon"
-                                    color={'#0E4E9B'}
-                                    size={24}
-                                />
-                                
-                                <Text style={{marginHorizontal:8}}>{`${infomationDistance} ${infomationDuration}`}</Text>
+                                <View style={{ flexDirection: 'row', marginHorizontal: 16, marginVertical: 8 }}>
+                                    <Icon
+                                        name="car-sport-outline"
+                                        type="ionicon"
+                                        color={'#0E4E9B'}
+                                        size={24}
+                                    />
+
+                                    <Text style={{ marginHorizontal: 8 }}>{`${infomationDistance} ${infomationDuration}`}</Text>
+                                    <Icon
+                                        name="bicycle-outline"
+                                        type="ionicon"
+                                        color={'#0E4E9B'}
+                                        size={24}
+                                    />
+
+                                    <Text style={{ marginHorizontal: 8 }}>{`${infomationDistance} ${infomationDuration}`}</Text>
                                 </View>
                             </View>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleSearch()}
-                            style={{marginVertical:60}}
+                            style={{ marginVertical: 60 }}
                         >
                             <Image
                                 source={require('../assets/icon/directions.png')}
@@ -583,7 +599,7 @@ const styles = StyleSheet.create({
         width: 80,
         backgroundColor: "transparent",
         height: 70,
-        marginRight:50,
+        marginRight: 50,
         // backgroundColor:'#0E4E9B'
     },
     textContainer: {
