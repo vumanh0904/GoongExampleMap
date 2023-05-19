@@ -120,12 +120,12 @@ const DistanceMatrixScreen = ({ navigation }) => {
                 },
             ],
         }));
-        const distance =directions.routes[0].legs[0].distance.text
-        const duration =directions.routes[0].legs[0].duration.text
+        const distance = directions.routes[0].legs[0].distance.text
+        const duration = directions.routes[0].legs[0].duration.text
         setInfomationDistance(distance)
         setInfomationDuration(duration)
     };
-    console.log("3333333",infomationDistance,infomationDuration)
+    console.log("3333333", infomationDistance, infomationDuration)
     const camera = useRef(null);
 
     const handleOnPress = (event) => {
@@ -137,13 +137,6 @@ const DistanceMatrixScreen = ({ navigation }) => {
         navigation.goBack();
     };
 
-    const updateSearch = (search) => {
-        setSearch(search);
-        setIsShowLocation(true)
-        if (search.length >= 5) {
-            getPlacesAutocomplete();
-        }
-    };
 
     const updateFromDirect = (text) => {
         setTxtFromDirect(text)
@@ -255,20 +248,13 @@ const DistanceMatrixScreen = ({ navigation }) => {
 
     const drawerRef = useRef(null);
 
-    const openDrawer = () => {
-        setIsShowDrawer(true)
-    };
-
-    const handleCancelDirect = () => {
-        setIsShowDrawer(false)
-    }
-
-    const handleBtnDirect = () => {
+    const handleSearch = () => {
         getDirections();
         setIsShowDrawer(false)
         setIsShowMarker(true)
         setZoomlevel(16)
-    }
+    };
+
 
     const renderHeader = () => {
         return (
@@ -323,7 +309,7 @@ const DistanceMatrixScreen = ({ navigation }) => {
                         color={'#959498'}
                         size={12}
                     />
-                    <Text>
+                    <Text >
                         {item.item.description}
                     </Text>
                     <View></View>
@@ -332,180 +318,155 @@ const DistanceMatrixScreen = ({ navigation }) => {
         );
     };
 
-    const renderSidebar = (
-
-        <View style={{ flex: 1 }}>
-            <View style={styles.locationDirect}>
-                <Icon
-                    name="ellipse-outline"
-                    type="ionicon"
-                    color={'#959498'}
-                    size={24}
-                />
-                <SearchBar
-                    placeholder={'Nhập đia điểm'}
-                    onChangeText={updateFromDirect}
-                    lightTheme={true}
-                    value={txtFromDirect}
-                    inputContainerStyle={styles.searchInputContainer}
-                    inputStyle={styles.textSearchInput}
-                    containerStyle={styles.searchContainerDirect}
-                />
-            </View>
-
-            <View style={{ marginVertical: 12 }}></View>
-            <View style={styles.locationDirect}>
-                <Icon
-                    name="location-outline"
-                    type="ionicon"
-                    color={'#959498'}
-                    size={24}
-                />
-                <SearchBar
-                    placeholder={'Nhập đia điểm đến'}
-                    onChangeText={updateToDirect}
-                    lightTheme={true}
-                    value={txtToDirect}
-                    inputContainerStyle={styles.searchInputContainer}
-                    inputStyle={styles.textSearchInput}
-                    containerStyle={styles.searchContainerDirect}
-                />
-            </View>
-
-            <View style={styles.btnViewDirect}>
-                <TouchableOpacity style={styles.btnDirect}
-                    onPress={() => handleBtnDirect()}
-                >
-                    <Text style={styles.txtDirect}>Chỉ đường</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => handleCancelDirect()}
-                    style={styles.btnDirectCancle}>
-                    <Text style={styles.txtDirect}>Hủy</Text>
-                </TouchableOpacity>
-            </View>
-            {
-                ishowFromDirect ?
-                    <View style={{ position: 'absolute', top: 72, left: 8, width: 280, backgroundColor: '#ccc' }}>
-                        <FlatList
-                            data={descriptionFromDirect}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                    : null
-            }
-            {
-                ishowToDirect ?
-                    <View style={{ position: 'absolute', top: 200, left: 8, width: 280, backgroundColor: '#ccc' }}>
-                        <FlatList
-                            data={descriptionToDirect}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                    : null
-            }
-        </View>
-
-    )
-
 
     return (
-        <Drawer
-            sidebar={renderSidebar}
-            position="left"
-            open={isShowDrawer}
-            drawerBackgroundColor="#fff"
-            ref={drawerRef}
-        >
-            <View style={{ flex: 1 }} >
-                <View style={{ flex: 0.08 }}>
-                    <SafeAreaView>{renderHeader()}</SafeAreaView>
-                </View>
-                <View style={{ flex: 1 }}>
-                    <MapboxGL.MapView
-                        styleURL={loadMap}
-                        onPress={handleOnPress}
-                        style={{ flex: 1 }}
-                        projection="globe"
-                        zoomEnabled={true}>
-                        <MapboxGL.Camera
-                            ref={camera}
-                            zoomLevel={zoomLevel}
-                            centerCoordinate={coordinates}
-                        >
-                        </MapboxGL.Camera>
+        <View style={{ flex: 1 }} >
+            <View style={{ flex: 0.08 }}>
+                <SafeAreaView>{renderHeader()}</SafeAreaView>
+            </View>
+            <View style={{ flex: 1 }}>
+                <MapboxGL.MapView
+                    styleURL={loadMap}
+                    onPress={handleOnPress}
+                    style={{ flex: 1 }}
+                    projection="globe"
+                    zoomEnabled={true}>
+                    <MapboxGL.Camera
+                        ref={camera}
+                        zoomLevel={zoomLevel}
+                        centerCoordinate={coordinates}
+                    >
+                    </MapboxGL.Camera>
 
-                        {locations.map(item => (
-                            <MapboxGL.PointAnnotation
-                                id="pointDirect"
-                                key="0909"
-                                coordinate={item.coord}
-                                draggable={true}>
-                                <MapboxGL.Callout title={item.key} />
-                            </MapboxGL.PointAnnotation>
-                        ))}
-                        {
-                            isShowMarker ?
-                                <MapboxGL.MarkerView id={"marker"} coordinate={coordinates}>
-                                    <View>
-                                        <View style={styles.markerContainer}>
-                                            <MapboxGL.Callout 
-                                            title={`${infomationDistance}\n${infomationDuration}`} />
-                                        </View>
-                                    </View>
-                                </MapboxGL.MarkerView> : null
-                        }
-
-
-                        <MapboxGL.ShapeSource id="line1" shape={route}>
-                            <MapboxGL.LineLayer
-                                id="linelayer1"
-                                style={{ lineColor: 'red', lineWidth: 5 }}
-                            >
-                            </MapboxGL.LineLayer>
-                        </MapboxGL.ShapeSource>
-
-                    </MapboxGL.MapView>
-
-
-                    <View style={styles.containerInput}>
-                        <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-                            <SearchBar
-                                placeholder={'Nhập đia điểm'}
-                                onChangeText={updateSearch}
-                                lightTheme={true}
-                                value={search}
-                                inputContainerStyle={styles.searchInputContainer}
-                                inputStyle={styles.textSearchInput}
-                                containerStyle={styles.searchContainer}
-                            />
-                            <TouchableOpacity
-                                style={{ marginVertical: 16 }}
-                                onPress={() => openDrawer()}
-                            >
-                                <Image
-                                    source={require('../assets/icon/directions.png')}
-                                    style={styles.icondirect}
-                                    tintColor={'#0E4E9B'}
-                                />
-                            </TouchableOpacity>
-
-                        </View>
-                    </View>
+                    {locations.map(item => (
+                        <MapboxGL.PointAnnotation
+                            id="pointDirect"
+                            key="0909"
+                            coordinate={item.coord}
+                            draggable={true}>
+                            <MapboxGL.Callout title={item.key} />
+                        </MapboxGL.PointAnnotation>
+                    ))}
                     {
-                        isShowLocation ?
-                            <View style={{ position: 'absolute', top: 64, left: 0, width: windowWidth, backgroundColor: '#FFFF' }}>
-                                <FlatList
-                                    data={description}
-                                    renderItem={renderItem}
-                                />
-                            </View>
-                            : null
+                        isShowMarker ?
+                            <MapboxGL.MarkerView id={"marker"} coordinate={coordinates}>
+                                {/* <View> */}
+                                    <View style={styles.markerContainer}>
+                                        <MapboxGL.Callout
+                                            title={`${infomationDistance}\n${infomationDuration}`} 
+                                            tooltip={true} 
+                                            textStyle={'red'}                                       
+                                            />
+                                    </View>
+                                {/* </View> */}
+                            </MapboxGL.MarkerView> : null
                     }
 
+
+                    <MapboxGL.ShapeSource id="line1" shape={route}>
+                        <MapboxGL.LineLayer
+                            id="linelayer1"
+                            style={{ lineColor: '#0E4E9B', lineWidth: 5 }}
+                        >
+                        </MapboxGL.LineLayer>
+                    </MapboxGL.ShapeSource>
+
+                </MapboxGL.MapView>
+                <View style={styles.containerInput}>
+                    <View style={{ flexDirection: 'row', backgroundColor: '#FFF', width: windowWidth }}>
+                        <View >
+                            <View style={styles.locationDirect}>
+                                <Icon
+                                    name="ellipse-outline"
+                                    type="ionicon"
+                                    color={'blue'}
+                                    size={24}
+                                />
+                                <SearchBar
+                                    placeholder={'Nhập đia điểm'}
+                                    onChangeText={updateFromDirect}
+                                    lightTheme={true}
+                                    value={txtFromDirect}
+                                    inputContainerStyle={styles.searchInputContainer}
+                                    inputStyle={styles.textSearchInput}
+                                    containerStyle={styles.searchContainerDirect}
+                                />
+                            </View>
+                            <View style={{ marginVertical: 4 }}></View>
+                            <View style={styles.locationDirect}>
+                                <Icon
+                                    name="location-outline"
+                                    type="ionicon"
+                                    color={'red'}
+                                    size={24}
+                                />
+                                <SearchBar
+                                    placeholder={'Nhập đia điểm đến'}
+                                    onChangeText={updateToDirect}
+                                    lightTheme={true}
+                                    value={txtToDirect}
+                                    inputContainerStyle={styles.searchInputContainer}
+                                    inputStyle={styles.textSearchInput}
+                                    containerStyle={styles.searchContainerDirect}
+                                />
+                            </View>
+                            <View>
+                                <View style={{flexDirection:'row', marginHorizontal:16, marginVertical:8}}>
+                                <Icon
+                                    name="car-sport-outline"
+                                    type="ionicon"
+                                    color={'#0E4E9B'}
+                                    size={24}
+                                />
+                                
+                                <Text style={{marginHorizontal:8}}>{`${infomationDistance} ${infomationDuration}`}</Text>
+                                <Icon
+                                    name="bicycle-outline"
+                                    type="ionicon"
+                                    color={'#0E4E9B'}
+                                    size={24}
+                                />
+                                
+                                <Text style={{marginHorizontal:8}}>{`${infomationDistance} ${infomationDuration}`}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => handleSearch()}
+                            style={{marginVertical:60}}
+                        >
+                            <Image
+                                source={require('../assets/icon/directions.png')}
+                                style={styles.icondirect}
+                                tintColor={'#0E4E9B'}
+                            />
+                        </TouchableOpacity>
+
+                    </View>
                 </View>
+                {
+                    ishowFromDirect ?
+                        <View style={{ position: 'absolute', top: 72, left: 4, width: 400, backgroundColor: '#FFF' }}>
+                            <FlatList
+                                data={descriptionFromDirect}
+                                renderItem={renderItem}
+                            />
+                        </View>
+                        : null
+                }
+                {
+                    ishowToDirect ?
+                        <View style={{ position: 'absolute', top: 140, left: 4, width: 400, backgroundColor: '#FFF' }}>
+                            <FlatList
+                                data={descriptionToDirect}
+                                renderItem={renderItem}
+                            />
+                        </View>
+                        : null
+                }
+
             </View>
-        </Drawer>
+        </View>
     );
 };
 
@@ -545,12 +506,8 @@ const styles = StyleSheet.create({
     textSearchInput: {
         fontSize: 14,
     },
-    searchContainer: {
-        width: 350,
-        marginHorizontal: 8,
-    },
     searchContainerDirect: {
-        width: 200,
+        width: 300,
         marginHorizontal: 8,
     },
     toolbar: {
@@ -576,7 +533,7 @@ const styles = StyleSheet.create({
     },
     itemSelect: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         paddingVertical: 12,
         marginHorizontal: 8,
         alignItems: 'center'
@@ -596,7 +553,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 12,
         alignItems: 'center',
-        marginVertical: 8
     },
     btnViewDirect: {
         flexDirection: 'row',
@@ -627,6 +583,8 @@ const styles = StyleSheet.create({
         width: 80,
         backgroundColor: "transparent",
         height: 70,
+        marginRight:50,
+        // backgroundColor:'#0E4E9B'
     },
     textContainer: {
         backgroundColor: "#ccc",
