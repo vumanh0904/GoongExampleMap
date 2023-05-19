@@ -21,8 +21,8 @@ const HomeScreen = ({navigation}) => {
     const handleAutoComplete = () => {
         navigation.navigate('AutoCompleteScreen')
     }
-    const handleGeocoding = () => {
-
+    const handleDistanceMatrix = () => {
+        navigation.navigate('DistanceMatrixScreen')
     }
     const handleFindPlace = () => {
         navigation.navigate('FindPlaceScreen')
@@ -40,7 +40,7 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.btnclick, styles.btnGeocoding]}
-                onPress={handleGeocoding}>
+                onPress={handleDistanceMatrix}>
                 <Text style={{ marginVertical: 8 }}>Distance Matrix</Text>
             </TouchableOpacity>
             <TouchableOpacity
