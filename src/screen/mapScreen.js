@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import {
   TouchableOpacity,
@@ -19,20 +19,18 @@ import {
   FlatList,
   Keyboard,
 } from 'react-native';
-import {SearchBar, Icon} from '@rneui/themed';
+import { SearchBar, Icon } from '@rneui/themed';
 import MapboxGL from '@rnmapbox/maps';
 import MapAPi from '../core/api/MapAPI';
 
 MapboxGL.setConnected(true);
-MapboxGL.setAccessToken(
-  'sk.eyJ1IjoibG9uZ25naGllbSIsImEiOiJjbGhhZHg1NTgwZGlsM2RvMm12cDZ2cGh2In0.JVjOoASg0qcDcXv5wD09dw',
-);
+MapboxGL.setAccessToken("<YOUR_ACCESSTOKEN>");
 
 const windowWidth = Dimensions.get('window').width;
 
 const MapScreen = () => {
   const [loadMap, setLoadMap] = useState(
-    'https://tiles.goong.io/assets/goong_map_web.json?api_key=YRBODwPBdSEYJQuV1BPYOQIIrtcyzP7z4fkkcsJT',
+    'https://tiles.goong.io/assets/goong_map_web.json?api_key=api_key',
   );
   const [coordinates] = useState([105.83991, 21.028]);
   const [txtLng, setTextLng] = useState('');
@@ -46,15 +44,7 @@ const MapScreen = () => {
     {
       key: '1',
       coord: [107.58472, 16.46278],
-    },
-    // {
-    //   key: '2',
-    //   coord: [108.277199, 14.058324],
-    // },
-    // {
-    //   key: '3',r
-    //   coord: [105.83991, 21.028],
-    // },
+    }
   ]);
   const handleAddMarker = () => {
     if (!txtLng || !txtlat) {
@@ -74,7 +64,6 @@ const MapScreen = () => {
 
   const getFIndText = async () => {
     let searchText = await MapAPi.getFindText(encodeURIComponent(search));
-    console.log('111111', searchText);
     setLocationLat(searchText.candidates[0].geometry.location.lat);
     setLocationLng(searchText.candidates[0].geometry.location.lng);
     setLocations(a => [
@@ -90,11 +79,9 @@ const MapScreen = () => {
   };
   const getPlacesAutocomplete = async () => {
     let autoComplete = await MapAPi.getPlacesAutocomplete({
-      // lat: encodeURIComponent(locationLat),
-      // lng: encodeURIComponent(locationLng),
       search: encodeURIComponent(search),
     });
-    setDescription(autoComplete.predictions);   
+    setDescription(autoComplete.predictions);
   };
 
   console.log('33333333', locations);
@@ -105,9 +92,9 @@ const MapScreen = () => {
     const loc = event.geometry.coordinates;
     camera.current?.moveTo(loc, 200);
   };
-  const handleEditMarker = () => {};
+  const handleEditMarker = () => { };
 
-  const handleDeleteMarker = () => {};
+  const handleDeleteMarker = () => { };
 
   const onCloseModel = () => {
     setIsVisible(false);
@@ -121,49 +108,49 @@ const MapScreen = () => {
     setSearch(search);
     getPlacesAutocomplete();
   };
-  const _handleSubmit =async(item :any)=>{
-      let geocoding = await MapAPi.getGeocoding({
-        description: encodeURIComponent(item.item.description),
-      });      
-      if(geocoding.status === 'OK'){
+  const _handleSubmit = async (item: any) => {
+    let geocoding = await MapAPi.getGeocoding({
+      description: encodeURIComponent(item.item.description),
+    });
+    if (geocoding.status === 'OK') {
 
-        setLocations(a => [
-          ...a,
-          {
-            key: (locations.length + 1).toString(),
-            coord: [
-              parseFloat(geocoding.results[0].geometry.location.lng),
-              parseFloat(geocoding.results[0].geometry.location.lat),
-            ],
-          },
-        ]);
-      }
-    
+      setLocations(a => [
+        ...a,
+        {
+          key: (locations.length + 1).toString(),
+          coord: [
+            parseFloat(geocoding.results[0].geometry.location.lng),
+            parseFloat(geocoding.results[0].geometry.location.lat),
+          ],
+        },
+      ]);
+    }
+
   }
 
 
-  const renderItem = (item:any) => {
+  const renderItem = (item: any) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          _handleSubmit(item);         
+          _handleSubmit(item);
         }}
-        >
+      >
         <View style={styles.itemSelect}>
           <Text>
-            {item.item.description} 
-          </Text>          
+            {item.item.description}
+          </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <MapboxGL.MapView
         styleURL={loadMap}
         onPress={handleOnPress}
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         projection="globe"
         zoomEnabled={true}>
         <MapboxGL.Camera
@@ -178,7 +165,6 @@ const MapScreen = () => {
         coordinate={coordinates}
         draggable={true}
          /> */}
-
         {/* many point */}
         {locations.map(item => (
           <MapboxGL.PointAnnotation
@@ -204,13 +190,13 @@ const MapScreen = () => {
           <TouchableOpacity
             style={[styles.btnHandleMarker, styles.btnHandleSearch]}
             onPress={() => getFIndText()}>
-            <Text style={{marginVertical: 8}}>Tìm</Text>
+            <Text style={{ marginVertical: 8 }}>Tìm</Text>
           </TouchableOpacity>
         </View>
-        <View style ={{backgroundColor:'#E0E0E0'}}>
+        <View style={{ backgroundColor: '#E0E0E0' }}>
           <FlatList
-          data={description} 
-          renderItem={renderItem} />
+            data={description}
+            renderItem={renderItem} />
         </View>
         <Text>Thay đổi location </Text>
         <View style={styles.backgroundContainer}>
@@ -227,21 +213,20 @@ const MapScreen = () => {
           <TouchableOpacity
             style={[styles.btnHandleMarker, styles.btnHandleAddMarker]}
             onPress={handleAddMarker}>
-            <Text style={{marginVertical: 8}}>Add</Text>
+            <Text style={{ marginVertical: 8 }}>Add</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btnHandleMarker, styles.btnHandleEditMarker]}
             onPress={handleEditMarker}>
-            <Text style={{marginVertical: 8}}>Edit</Text>
+            <Text style={{ marginVertical: 8 }}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btnHandleMarker, styles.btnHandleDeleteMarker]}
             onPress={handleDeleteMarker}>
-            <Text style={{marginVertical: 8}}>Delete</Text>
+            <Text style={{ marginVertical: 8 }}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>
-      {/* {visible ? LocationModel():null} */}
     </View>
   );
 };

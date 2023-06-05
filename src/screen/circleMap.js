@@ -28,15 +28,13 @@ import {
 import GeneralStatusBar from '../config/generalStatusBar/GeneralStatusBar';
 
 MapboxGL.setConnected(true);
-MapboxGL.setAccessToken(
-    'sk.eyJ1IjoibG9uZ25naGllbSIsImEiOiJjbGhhZHg1NTgwZGlsM2RvMm12cDZ2cGh2In0.JVjOoASg0qcDcXv5wD09dw',
-);
+MapboxGL.setAccessToken("<YOUR_ACCESSTOKEN>");
 
 const windowWidth = Dimensions.get('window').width;
 
 const CircleMapScreen = ({ navigation }) => {
     const [loadMap, setLoadMap] = useState(
-        'https://tiles.goong.io/assets/goong_map_web.json?api_key=YRBODwPBdSEYJQuV1BPYOQIIrtcyzP7z4fkkcsJT',
+        'https://tiles.goong.io/assets/goong_map_web.json?api_key=api_key',
     );
     const [coordinates, setCoordinates] = useState([105.79068762200006, 21.017693335000047]);
     const [radius, setRadius] = useState(25);
