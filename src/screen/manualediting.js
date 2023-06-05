@@ -15,7 +15,6 @@ import {
     View,
     Dimensions,
     Alert,
-    SafeAreaView,
     FlatList,
     Keyboard,
 } from 'react-native';
@@ -23,6 +22,12 @@ import { SearchBar, Icon } from '@rneui/themed';
 import MapboxGL from '@rnmapbox/maps';
 import MapAPi from '../core/api/MapAPI';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import {
+    SafeAreaInsetsContext,
+    SafeAreaView,
+} from 'react-native-safe-area-context';
+
+import GeneralStatusBar from '../config/generalStatusBar/GeneralStatusBar';
 
 MapboxGL.setConnected(true);
 MapboxGL.setAccessToken(
@@ -117,6 +122,7 @@ const ManualEditingScreen = ({ navigation }) => {
 
     const renderItem = (item) => {
         return (
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
                 <View style={styles.itemSelect}>
                     <Icon
@@ -163,78 +169,94 @@ const ManualEditingScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={{ flex: 1 }}>
-            <View style={{ flex: 0.08 }}>
-                <SafeAreaView>{renderHeader()}</SafeAreaView>
-            </View>
-            <View style={{ flex: 1 }}>
-                <MapboxGL.MapView
-                    styleURL={loadMap}
-                    onPress={handleOnPress}
-                    style={{ flex: 1 }}
-                    projection="globe"
-                    zoomEnabled={true}>
-                    <MapboxGL.Camera
-                        ref={camera}
-                        zoomLevel={4}
-                        centerCoordinate={coordinates}
+        <SafeAreaInsetsContext.Consumer>
+            {insets => (
+                <>
+                    <GeneralStatusBar
+                        backgroundColor={'transparent'}
+                        barStyle="transparent"
+
                     />
+                    <SafeAreaView
+                        style={{
+                            backgroundColor: "#0E4E9B",
+                            paddingTop: 0,
+                            paddingBottom: Platform.OS == 'ios' ? -48 : 0,
+                        }}>
+                        {renderHeader()}
+                    </SafeAreaView>
+                    <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1 }}>
+                            <MapboxGL.MapView
+                                styleURL={loadMap}
+                                onPress={handleOnPress}
+                                style={{ flex: 1 }}
+                                projection="globe"
+                                zoomEnabled={true}>
+                                <MapboxGL.Camera
+                                    ref={camera}
+                                    zoomLevel={4}
+                                    centerCoordinate={coordinates}
+                                />
 
-                    {/* many point */}
-                    {locations.map(item => (
-                        <MapboxGL.PointAnnotation
-                            id="pointDirect"
-                            key="0909"
-                            coordinate={item.coord}
-                            draggable={true}>
-                            <MapboxGL.Callout title={item.key} />
-                        </MapboxGL.PointAnnotation>
-                    ))}
-                </MapboxGL.MapView>
-                <View style={styles.containerInput}>
+                                {/* many point */}
+                                {locations.map(item => (
+                                    <MapboxGL.PointAnnotation
+                                        id="pointDirect"
+                                        key="0909"
+                                        coordinate={item.coord}
+                                        draggable={true}>
+                                        <MapboxGL.Callout title={item.key} />
+                                    </MapboxGL.PointAnnotation>
+                                ))}
+                            </MapboxGL.MapView>
+                            <View style={styles.containerInput}>
 
-                    <View style={{ backgroundColor: '#E0E0E0' }}>
-                        <FlatList
-                            data={description}
-                            renderItem={renderItem} />
-                    </View>
-                    <Text>Thay đổi location </Text>
-                    <View style={styles.backgroundContainer}>
-                        <TextInput
-                            style={styles.inputLng}
-                            onChangeText={setTextLng}
-                            value={txtLng}
-                        />
-                        <TextInput
-                            style={styles.inputLat}
-                            onChangeText={setTextLat}
-                            value={txtlat}
-                        />
-                        <TouchableOpacity
-                            style={[styles.btnHandleMarker, styles.btnHandleAddMarker]}
-                            onPress={handleAddMarker}>
-                            <Text style={{ marginVertical: 8 }}>Add</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.btnHandleMarker, styles.btnHandleEditMarker]}
-                            onPress={handleChangeMarker}>
-                            <Text style={{ marginVertical: 8 }}>Change</Text>
-                        </TouchableOpacity>
+                                <View style={{ backgroundColor: '#E0E0E0' }}>
+                                    <FlatList
+                                        data={description}
+                                        renderItem={renderItem} />
+                                </View>
+                                <Text>Thay đổi location </Text>
+                                <View style={styles.backgroundContainer}>
+                                    <TextInput
+                                        style={styles.inputLng}
+                                        onChangeText={setTextLng}
+                                        value={txtLng}
+                                    />
+                                    <TextInput
+                                        style={styles.inputLat}
+                                        onChangeText={setTextLat}
+                                        value={txtlat}
+                                    />
+                                    <TouchableOpacity
+                                        style={[styles.btnHandleMarker, styles.btnHandleAddMarker]}
+                                        onPress={handleAddMarker}>
+                                        <Text style={{ marginVertical: 8 }}>Add</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.btnHandleMarker, styles.btnHandleEditMarker]}
+                                        onPress={handleChangeMarker}>
+                                        <Text style={{ marginVertical: 8 }}>Change</Text>
+                                    </TouchableOpacity>
 
-                    </View>
-                </View>
-                {
-                    isShowLocation ?
-                        <View style={{ position: 'absolute', top: 72, left: 0, width: windowWidth, backgroundColor: '#FFFF' }}>
-                            <FlatList
-                                data={locations}
-                                renderItem={renderItem}
-                            />
+                                </View>
+                            </View>
+                            {
+                                isShowLocation ?
+                                    <View style={{ position: 'absolute', top: 72, left: 0, width: windowWidth, backgroundColor: '#FFFF' }}>
+                                        <FlatList
+                                            data={locations}
+                                            renderItem={renderItem}
+                                        />
+                                    </View>
+                                    : null
+                            }
                         </View>
-                        : null
-                }
-            </View>
-        </View>
+                    </View>
+                </>
+            )}
+        </SafeAreaInsetsContext.Consumer >
     );
 };
 

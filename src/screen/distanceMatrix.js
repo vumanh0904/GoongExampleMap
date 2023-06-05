@@ -621,7 +621,7 @@ const DistanceMatrixScreen = ({ navigation }) => {
                     {isShowHeader ?
                         <SafeAreaView
                             style={{
-                                backgroundColor: "#fff",
+                                backgroundColor: "#0E4E9B",
                                 paddingTop: 0,
                                 paddingBottom: Platform.OS == 'ios' ? -48 : 0,
                             }}>

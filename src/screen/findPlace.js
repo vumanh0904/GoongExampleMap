@@ -15,13 +15,15 @@ import {
     View,
     Dimensions,
     Alert,
-    SafeAreaView,
-    FlatList,
-    Keyboard,
 } from 'react-native';
+import {
+    SafeAreaInsetsContext,
+    SafeAreaView,
+} from 'react-native-safe-area-context';
 import { SearchBar, Icon } from '@rneui/themed';
 import MapboxGL from '@rnmapbox/maps';
 import MapAPi from '../core/api/MapAPI';
+import GeneralStatusBar from '../config/generalStatusBar/GeneralStatusBar';
 
 MapboxGL.setConnected(true);
 MapboxGL.setAccessToken(
@@ -30,7 +32,7 @@ MapboxGL.setAccessToken(
 
 const windowWidth = Dimensions.get('window').width;
 
-const FindPlaceScreen = ({navigation}) => {
+const FindPlaceScreen = ({ navigation }) => {
     const [loadMap, setLoadMap] = useState(
         'https://tiles.goong.io/assets/goong_map_web.json?api_key=YRBODwPBdSEYJQuV1BPYOQIIrtcyzP7z4fkkcsJT',
     );
@@ -38,7 +40,7 @@ const FindPlaceScreen = ({navigation}) => {
     const [txtLng, setTextLng] = useState('');
     const [txtlat, setTextLat] = useState('');
     const [search, setSearch] = useState('');
-    const [zoomLevel, setZoomlevel] =  useState(4);
+    const [zoomLevel, setZoomlevel] = useState(4);
 
     const [locations, setLocations] = useState([]);
     const handleAddMarker = () => {
@@ -113,53 +115,69 @@ const FindPlaceScreen = ({navigation}) => {
 
 
     return (
-        <View style={{ flex: 1 }}  >
-            <View style={{ flex: 0.08 }}>
-                <SafeAreaView>{renderHeader()}</SafeAreaView>
-            </View>
-            <View style={{ flex: 1 }}>
-                <MapboxGL.MapView
-                    styleURL={loadMap}
-                    onPress={handleOnPress}
-                    style={{ flex: 1 }}
-                    projection="globe"
-                    zoomEnabled={true}>
-                    <MapboxGL.Camera
-                        ref={camera}
-                        zoomLevel={zoomLevel}
-                        centerCoordinate={coordinates}
+        <SafeAreaInsetsContext.Consumer>
+            {insets => (
+                <>
+                    <GeneralStatusBar
+                        backgroundColor={'transparent'}
+                        barStyle="transparent"
+
                     />
-                    {locations.map(item => (
-                        <MapboxGL.PointAnnotation
-                            id="pointDirect"
-                            key="0909"
-                            coordinate={item.coord}
-                            draggable={true}>
-                            <MapboxGL.Callout title={item.key} />
-                        </MapboxGL.PointAnnotation>
-                    ))}
-                </MapboxGL.MapView>
-                <View style={styles.containerInput}>
-                    <View>
-                        <SearchBar
-                            placeholder={'Nhập đia điểm'}
-                            onChangeText={updateSearch}
-                            lightTheme={true}
-                            value={search}
-                            inputContainerStyle={styles.searchInputContainer}
-                            inputStyle={styles.textSearchInput}
-                            containerStyle={styles.searchContainer}
-                            showCancel={false}
-                        />
-                        <TouchableOpacity
-                            style={[styles.btnHandleMarker, styles.btnHandleSearch]}
-                            onPress={() => getFIndText()}>
-                            <Text style={{ marginVertical: 8 }}>Tìm</Text>
-                        </TouchableOpacity>
-                    </View>                   
-                </View>
-            </View>
-        </View>
+                    <SafeAreaView
+                        style={{
+                            backgroundColor: "#0E4E9B",
+                            paddingTop: 0,
+                            paddingBottom: Platform.OS == 'ios' ? -48 : 0,
+                        }}>
+                        {renderHeader()}
+                    </SafeAreaView>
+                    <View style={{ flex: 1 }}  >
+                        <View style={{ flex: 1 }}>
+                            <MapboxGL.MapView
+                                styleURL={loadMap}
+                                onPress={handleOnPress}
+                                style={{ flex: 1 }}
+                                projection="globe"
+                                zoomEnabled={true}>
+                                <MapboxGL.Camera
+                                    ref={camera}
+                                    zoomLevel={zoomLevel}
+                                    centerCoordinate={coordinates}
+                                />
+                                {locations.map(item => (
+                                    <MapboxGL.PointAnnotation
+                                        id="pointDirect"
+                                        key="0909"
+                                        coordinate={item.coord}
+                                        draggable={true}>
+                                        <MapboxGL.Callout title={item.key} />
+                                    </MapboxGL.PointAnnotation>
+                                ))}
+                            </MapboxGL.MapView>
+                            <View style={styles.containerInput}>
+                                <View>
+                                    <SearchBar
+                                        placeholder={'Nhập đia điểm'}
+                                        onChangeText={updateSearch}
+                                        lightTheme={true}
+                                        value={search}
+                                        inputContainerStyle={styles.searchInputContainer}
+                                        inputStyle={styles.textSearchInput}
+                                        containerStyle={styles.searchContainer}
+                                        showCancel={false}
+                                    />
+                                    <TouchableOpacity
+                                        style={[styles.btnHandleMarker, styles.btnHandleSearch]}
+                                        onPress={() => getFIndText()}>
+                                        <Text style={{ marginVertical: 8 }}>Tìm</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </>
+            )}
+        </SafeAreaInsetsContext.Consumer >
     );
 };
 

@@ -14,8 +14,6 @@ import {
     TextInput,
     View,
     Dimensions,
-    Animated,
-    SafeAreaView,
     FlatList,
     Keyboard,
 } from 'react-native';
@@ -23,6 +21,11 @@ import { SearchBar, Icon } from '@rneui/themed';
 import MapboxGL from '@rnmapbox/maps';
 import MapAPi from '../core/api/MapAPI';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import {
+    SafeAreaInsetsContext,
+    SafeAreaView,
+} from 'react-native-safe-area-context';
+import GeneralStatusBar from '../config/generalStatusBar/GeneralStatusBar';
 
 MapboxGL.setConnected(true);
 MapboxGL.setAccessToken(
@@ -88,10 +91,10 @@ const CircleMapScreen = ({ navigation }) => {
 
     const handlePanGestureEvent = ({ nativeEvent }) => {
         if (nativeEvent.state === State.ACTIVE) {
-          const newRadius = // Tính toán bán kính mới dựa trên sự di chuyển của người dùng
-          setCircleRadius(newRadius);
+            const newRadius = // Tính toán bán kính mới dựa trên sự di chuyển của người dùng
+                setCircleRadius(newRadius);
         }
-      };
+    };
 
     const _handleSubmit = async (item) => {
 
@@ -175,80 +178,94 @@ const CircleMapScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={{ flex: 1 }} >
-            <View style={{ flex: 0.08 }}>
-                <SafeAreaView>{renderHeader()}</SafeAreaView>
-            </View>
-            <View style={{ flex: 1 }}>
-                <MapboxGL.MapView
-                    styleURL={loadMap}
-                    onPress={handleOnPress}
-                    style={{ flex: 1 }}
-                    projection="globe"
-                    zoomEnabled={true}>
-                    <MapboxGL.Camera
-                        ref={camera}
-                        zoomLevel={zoomLevel}
-                        centerCoordinate={coordinates}
+        <SafeAreaInsetsContext.Consumer>
+            {insets => (
+                <>
+                    <GeneralStatusBar
+                        backgroundColor={'transparent'}
+                        barStyle="transparent"
+
                     />
-                    {locations.map(item => (
-                        <MapboxGL.PointAnnotation
-                            id="pointDirect"
-                            key="0909"
-                            coordinate={item.coord}
-                            draggable={true}>
-                            <MapboxGL.Callout title={item.key} />
-                        </MapboxGL.PointAnnotation>
-                    ))}
-                    {
-                        isShowCircle ?
-                            <MapboxGL.ShapeSource id="circleSource"
-                                shape={createCircle(coordinates, radius)}
-                            >
-                                <MapboxGL.CircleLayer
-                                    id="circleLayer"
-                                    ref={circleRef}
-                                    minZoomLevel={10}
-                                    maxZoomLevel={16}
-                                    style={{                
-                                        circleColor: 'rgba(0, 0, 255, 0.5)',
-                                        circleStrokeWidth: 50,
-                                        circleStrokeWidthTransition: { duration: 300, delay: 50 },
-                                        circleStrokeColor: 'rgba(0, 0, 255, 0.5)'
-                                    }} />
-                            </MapboxGL.ShapeSource> : null
-                    }
-                    <PanGestureHandler onGestureEvent={handlePanGestureEvent}>
-                        <View style={{ flex: 1 }} />
-                    </PanGestureHandler>
-                </MapboxGL.MapView>
-                <View style={styles.containerInput}>
-                    <View>
-                        <SearchBar
-                            placeholder={'Nhập đia điểm'}
-                            onChangeText={updateSearch}
-                            lightTheme={true}
-                            value={search}
-                            inputContainerStyle={styles.searchInputContainer}
-                            inputStyle={styles.textSearchInput}
-                            containerStyle={styles.searchContainerDirect}
-                        />
+                    <SafeAreaView
+                        style={{
+                            backgroundColor: "#0E4E9B",
+                            paddingTop: 0,
+                            paddingBottom: Platform.OS == 'ios' ? -48 : 0,
+                        }}>
+                        {renderHeader()}
+                    </SafeAreaView>
+                    <View style={{ flex: 1 }}>
+                        <MapboxGL.MapView
+                            styleURL={loadMap}
+                            onPress={handleOnPress}
+                            style={{ flex: 1 }}
+                            projection="globe"
+                            zoomEnabled={true}>
+                            <MapboxGL.Camera
+                                ref={camera}
+                                zoomLevel={zoomLevel}
+                                centerCoordinate={coordinates}
+                            />
+                            {locations.map(item => (
+                                <MapboxGL.PointAnnotation
+                                    id="pointDirect"
+                                    key="0909"
+                                    coordinate={item.coord}
+                                    draggable={true}>
+                                    <MapboxGL.Callout title={item.key} />
+                                </MapboxGL.PointAnnotation>
+                            ))}
+                            {
+                                isShowCircle ?
+                                    <MapboxGL.ShapeSource id="circleSource"
+                                        shape={createCircle(coordinates, radius)}
+                                    >
+                                        <MapboxGL.CircleLayer
+                                            id="circleLayer"
+                                            ref={circleRef}
+                                            minZoomLevel={10}
+                                            maxZoomLevel={16}
+                                            style={{
+                                                circleColor: 'rgba(0, 0, 255, 0.5)',
+                                                circleStrokeWidth: 50,
+                                                circleStrokeWidthTransition: { duration: 300, delay: 50 },
+                                                circleStrokeColor: 'rgba(0, 0, 255, 0.5)'
+                                            }} />
+                                    </MapboxGL.ShapeSource> : null
+                            }
+                            <PanGestureHandler onGestureEvent={handlePanGestureEvent}>
+                                <View style={{ flex: 1 }} />
+                            </PanGestureHandler>
+                        </MapboxGL.MapView>
+                        <View style={styles.containerInput}>
+                            <View>
+                                <SearchBar
+                                    placeholder={'Nhập đia điểm'}
+                                    onChangeText={updateSearch}
+                                    lightTheme={true}
+                                    value={search}
+                                    inputContainerStyle={styles.searchInputContainer}
+                                    inputStyle={styles.textSearchInput}
+                                    containerStyle={styles.searchContainerDirect}
+                                />
+
+                            </View>
+                        </View>
+                        {
+                            isShowLocation ?
+                                <View style={{ position: 'absolute', top: 64, left: 16, width: 365, backgroundColor: '#FFFF' }}>
+                                    <FlatList
+                                        data={description}
+                                        renderItem={renderItem}
+                                    />
+                                </View>
+                                : null
+                        }
 
                     </View>
-                </View>
-                {
-                    isShowLocation ?
-                        <View style={{ position: 'absolute', top: 64, left: 16, width: 365, backgroundColor: '#FFFF' }}>
-                            <FlatList
-                                data={description}
-                                renderItem={renderItem}
-                            />
-                        </View>
-                        : null
-                }
-
-            </View>
-        </View>
+                </>
+            )}
+        </SafeAreaInsetsContext.Consumer >
     );
 };
 
