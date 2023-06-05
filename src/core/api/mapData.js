@@ -3,6 +3,6 @@ const API_LIST = {
   PlacesAutocomplete:'/Place/AutoComplete?api_key=',
   Geocoding:'/Geocode?address=',
   PlaceDetail:'/Place/Detail?place_id=',
-  Directions:'/Direction?vehicle=car&api_key=',
+  Directions:'/Direction?vehicle=',
 };
 export default API_LIST;

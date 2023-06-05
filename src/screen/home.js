@@ -30,6 +30,9 @@ const HomeScreen = ({navigation}) => {
     const handleManualEditing = () => {
         navigation.navigate('ManualEditingScreen')
     }
+    const handleCircelMaping = () => {
+        navigation.navigate('CircleMapScreen')
+    }
 
     return (
         <View style={styles.container} >
@@ -52,6 +55,11 @@ const HomeScreen = ({navigation}) => {
                 style={[styles.btnclick, styles.btnManualEditing]}
                 onPress={handleManualEditing}>
                 <Text style={{ marginVertical: 8 }}>Manual editing</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.btnclick, styles.btnCircleMap]}
+                onPress={handleCircelMaping}>
+                <Text style={{ marginVertical: 8 }}>Circle Maping</Text>
             </TouchableOpacity>
         </View>
     );
@@ -86,7 +94,11 @@ const styles = StyleSheet.create({
     btnManualEditing:{
         backgroundColor: 'green',
         borderColor: 'green',
-    }
+    },
+    btnCircleMap:{
+        backgroundColor: 'orange',
+        borderColor: 'orange',
+    },
 });
 
 export default HomeScreen;

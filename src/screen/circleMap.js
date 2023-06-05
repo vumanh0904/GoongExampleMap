@@ -14,7 +14,7 @@ import {
     TextInput,
     View,
     Dimensions,
-    Alert,
+    Animated,
     SafeAreaView,
     FlatList,
     Keyboard,
@@ -22,6 +22,7 @@ import {
 import { SearchBar, Icon } from '@rneui/themed';
 import MapboxGL from '@rnmapbox/maps';
 import MapAPi from '../core/api/MapAPI';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 MapboxGL.setConnected(true);
 MapboxGL.setAccessToken(
@@ -30,18 +31,33 @@ MapboxGL.setAccessToken(
 
 const windowWidth = Dimensions.get('window').width;
 
-const AutoCompleteScreen = ({navigation}) => {
+const CircleMapScreen = ({ navigation }) => {
     const [loadMap, setLoadMap] = useState(
         'https://tiles.goong.io/assets/goong_map_web.json?api_key=YRBODwPBdSEYJQuV1BPYOQIIrtcyzP7z4fkkcsJT',
     );
-    const [coordinates] = useState([105.83991, 21.028]);
+    const [coordinates, setCoordinates] = useState([105.79068762200006, 21.017693335000047]);
+    const [radius, setRadius] = useState(25);
 
     const [search, setSearch] = useState('');
     const [isShowLocation, setIsShowLocation] = useState(true)
-    const [zoomLevel, setZoomlevel] =  useState(4);
+    const [isShowCircle, setShowCirCle] = useState(false)
+    const [zoomLevel, setZoomlevel] = useState(4);
 
     const [description, setDescription] = useState([]);
     const [locations, setLocations] = useState([]);
+
+    const createCircle = () => {
+        return {
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: coordinates,
+            },
+            properties: {
+                radius: radius,
+            },
+        };
+    };
 
     const getPlacesAutocomplete = async () => {
         let autoComplete = await MapAPi.getPlacesAutocomplete({
@@ -49,9 +65,9 @@ const AutoCompleteScreen = ({navigation}) => {
         });
         setDescription(autoComplete.predictions);
     };
-    
 
     const camera = useRef(null);
+    const circleRef = useRef(null);
 
     const handleOnPress = (event) => {
         const loc = event.geometry.coordinates;
@@ -65,38 +81,47 @@ const AutoCompleteScreen = ({navigation}) => {
     const updateSearch = (search) => {
         setSearch(search);
         setIsShowLocation(true)
-        if(search.length >=5){
+        if (search.length >= 5) {
             getPlacesAutocomplete();
-        }        
+        }
     };
-    const _handleSubmit = async (item) => {
-        
-        let geocoding = await MapAPi.getGeocoding({
-            description:  encodeURIComponent(item.item.description),
-        });        
 
+    const handlePanGestureEvent = ({ nativeEvent }) => {
+        if (nativeEvent.state === State.ACTIVE) {
+          const newRadius = // Tính toán bán kính mới dựa trên sự di chuyển của người dùng
+          setCircleRadius(newRadius);
+        }
+      };
+
+    const _handleSubmit = async (item) => {
+
+        let geocoding = await MapAPi.getGeocoding({
+            description: encodeURIComponent(item.item.description),
+        });
         let placeDetail = await MapAPi.getPlaceDetail({
             place_id: description[item.index].place_id
         });
-       
-        const address = placeDetail.result.formatted_address
-        
-        if (geocoding.status === 'OK') {
-                setLocations(a => [
-                    ...a,
-                    {
-                        key: address,
-                        coord: [
-                            parseFloat(geocoding.results[item.index].geometry.location.lng),
-                            parseFloat(geocoding.results[item.index].geometry.location.lat),
-                        ],
-                    },
-                ]);
-            
-            
-            setZoomlevel(10)
-        }
 
+        const address = placeDetail.result.formatted_address
+
+        if (geocoding.status === 'OK') {
+            setLocations(a => [
+                ...a,
+                {
+                    key: address,
+                    coord: [
+                        parseFloat(geocoding.results[item.index].geometry.location.lng),
+                        parseFloat(geocoding.results[item.index].geometry.location.lat),
+                    ],
+                },
+            ]);
+            setCoordinates(
+                [parseFloat(geocoding.results[item.index].geometry.location.lng),
+                parseFloat(geocoding.results[item.index].geometry.location.lat)])
+
+            setZoomlevel(14)
+            setShowCirCle(true)
+        }
     }
 
     const renderHeader = () => {
@@ -129,7 +154,7 @@ const AutoCompleteScreen = ({navigation}) => {
                 onPress={() => {
                     setSearch(item.item.description)
                     setIsShowLocation(false)
-                    _handleSubmit(item);                    
+                    _handleSubmit(item);
                 }}
                 style={{ paddingLeft: 8 }}
             >
@@ -140,7 +165,7 @@ const AutoCompleteScreen = ({navigation}) => {
                         color={'#959498'}
                         size={12}
                     />
-                    <Text>
+                    <Text style={{ textAlign: 'left' }}>
                         {item.item.description}
                     </Text>
                     <View></View>
@@ -151,7 +176,7 @@ const AutoCompleteScreen = ({navigation}) => {
 
     return (
         <View style={{ flex: 1 }} >
-            <View style={{ flex: 0.08}}>
+            <View style={{ flex: 0.08 }}>
                 <SafeAreaView>{renderHeader()}</SafeAreaView>
             </View>
             <View style={{ flex: 1 }}>
@@ -175,6 +200,27 @@ const AutoCompleteScreen = ({navigation}) => {
                             <MapboxGL.Callout title={item.key} />
                         </MapboxGL.PointAnnotation>
                     ))}
+                    {
+                        isShowCircle ?
+                            <MapboxGL.ShapeSource id="circleSource"
+                                shape={createCircle(coordinates, radius)}
+                            >
+                                <MapboxGL.CircleLayer
+                                    id="circleLayer"
+                                    ref={circleRef}
+                                    minZoomLevel={10}
+                                    maxZoomLevel={16}
+                                    style={{                
+                                        circleColor: 'rgba(0, 0, 255, 0.5)',
+                                        circleStrokeWidth: 50,
+                                        circleStrokeWidthTransition: { duration: 300, delay: 50 },
+                                        circleStrokeColor: 'rgba(0, 0, 255, 0.5)'
+                                    }} />
+                            </MapboxGL.ShapeSource> : null
+                    }
+                    <PanGestureHandler onGestureEvent={handlePanGestureEvent}>
+                        <View style={{ flex: 1 }} />
+                    </PanGestureHandler>
                 </MapboxGL.MapView>
                 <View style={styles.containerInput}>
                     <View>
@@ -185,22 +231,22 @@ const AutoCompleteScreen = ({navigation}) => {
                             value={search}
                             inputContainerStyle={styles.searchInputContainer}
                             inputStyle={styles.textSearchInput}
-                            containerStyle={styles.searchContainer}
+                            containerStyle={styles.searchContainerDirect}
                         />
 
                     </View>
                 </View>
                 {
                     isShowLocation ?
-                    <View style={{ position: 'absolute', top: 64, left: 0, width: windowWidth, backgroundColor: '#FFFF' }}>
-                    <FlatList
-                        data={description}
-                        renderItem={renderItem}
-                    />                   
-                    </View>
-                     :null
+                        <View style={{ position: 'absolute', top: 64, left: 16, width: 365, backgroundColor: '#FFFF' }}>
+                            <FlatList
+                                data={description}
+                                renderItem={renderItem}
+                            />
+                        </View>
+                        : null
                 }
-               
+
             </View>
         </View>
     );
@@ -214,10 +260,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 2,
         left: 0,
-        width: windowWidth,
-        borderColor: '#E0E0E0',
-        borderWidth: 1,
-        backgroundColor: '#FFFF',
     },
     backgroundContainer: {
         flexDirection: 'row',
@@ -244,11 +286,11 @@ const styles = StyleSheet.create({
         borderColor: '#FFFF',
     },
     textSearchInput: {
-        fontSize: 10,
+        fontSize: 14,
     },
-    searchContainer: {
-        padding: 0,
-        backgroundColor: '#FFFF',
+    searchContainerDirect: {
+        width: 380,
+        marginHorizontal: 8,
     },
     toolbar: {
         alignItems: 'center',
@@ -272,16 +314,19 @@ const styles = StyleSheet.create({
         right: 16,
     },
     itemSelect: {
-        // flexDirection: 'row',
-        // justifyContent: 'space-between',
-        // alignItems:'center',
-        // paddingVertical: 12,
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 12,
-        marginHorizontal: 8,
         alignItems: 'center'
+    },
+    circles: {
+        visibility: 'visible',
+        circleRadius: 40,
+        circleColor: 'red',
+        circleStrokeColor: 'black',
+        circleStrokeWidth: 5,
+        circleOpacity: 0.0
     },
 });
 
-export default AutoCompleteScreen;
+export default CircleMapScreen;
